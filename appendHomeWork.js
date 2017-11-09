@@ -11,7 +11,7 @@ function appendHomeWork(subj, task, deadline) {
     throw new Error('No such subject exist');
   }
 
-  if (!deadline) deadline = nextClassIs(subj);
+  if (deadline === 'auto') deadline = nextClassIs(subj);
 
   tasksToDo[subj].push({ task, deadline });
   fs.writeFileSync('./dataBase/data.json', JSON.stringify(tasksToDo));
