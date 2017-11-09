@@ -22,7 +22,7 @@ bot.onText(/\/echo (.+)/, (msg) => {
   bot.sendMessage(chatId, resp);
 });
 
-let taskArr = {};
+let taskObj = {};
 let taskFlag1 = false;
 let taskFlag2 = false;
 let taskFlag3 = false;
@@ -39,10 +39,10 @@ bot.onText(/\/get (.+)/, (msg, match) => {
   const chatId = msg.chat.id;
   const taskData = JSON.parse(fs.readFileSync('./dataBase/data.json'));
   if (Object.keys(taskData).includes(match[1])) {
-    const subjTaskArr = taskData[match[1]];
-    console.log(subjTaskArr);
-    if (subjTaskArr.length !== 0) {
-      subjTaskArr.forEach((item) => {
+    const subjtaskObj = taskData[match[1]];
+    console.log(subjtaskObj);
+    if (subjtaskObj.length !== 0) {
+      subjtaskObj.forEach((item) => {
         bot.sendMessage(chatId, item.task + ' - ' + item.deadline);
         if (item.fileId) bot.sendDocument(chatId, item.fileId);
       });
@@ -56,23 +56,23 @@ bot.on('message', (msg) => {
   if (taskFlag4) {
     if (msg.text !== 'No') {
       if (msg.document) {
-        taskArr.fileId = msg.document.file_id;
+        taskObj.fileId = msg.document.file_id;
       } else {
         bot.sendMessage(chatId, 'Not a file!');
       }
     } else {
       taskFlag4 = false;
-      apw.appendHomeWork(taskArr.subj, taskArr.task,
-        taskArr.deadline, taskArr.fileId);
+      apw.appendHomeWork(taskObj.subj, taskObj.task,
+        taskObj.deadline, taskObj.fileId);
       bot.sendMessage(chatId, 'Hometask has been successfully added!');
-      taskArr = {};
+      taskObj = {};
     }
-    // taskArr.deadline = msg.text;
-    // console.log(taskArr);
+    // taskObj.deadline = msg.text;
+    // console.log(taskObj);
   }
   if (taskFlag3) {
-    taskArr.deadline = msg.text;
-    // console.log(taskArr);
+    taskObj.deadline = msg.text;
+    // console.log(taskObj);
     bot.sendMessage(chatId, 'Would you like to add file or image?',
       {
         'reply_markup': { 'keyboard': [[{ text: 'No' }]],
@@ -82,8 +82,8 @@ bot.on('message', (msg) => {
     taskFlag4 = true;
   }
   if (taskFlag2) {
-    taskArr.task = msg.text;
-    // console.log(taskArr);
+    taskObj.task = msg.text;
+    // console.log(taskObj);
     bot.sendMessage(chatId, 'Enter hometask deadline: ',
       {
         'reply_markup': { 'keyboard': [[{ text: 'auto' }]],
@@ -93,8 +93,8 @@ bot.on('message', (msg) => {
     taskFlag3 = true;
   }
   if (taskFlag1) {
-    taskArr.subj = msg.text;
-    // console.log(taskArr);
+    taskObj.subj = msg.text;
+    // console.log(taskObj);
     bot.sendMessage(chatId, 'Enter your hometask: ');
     taskFlag1 = false;
     taskFlag2 = true;
