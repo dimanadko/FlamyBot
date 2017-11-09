@@ -25,6 +25,8 @@ let taskArr = {};
 let taskFlag1 = false;
 let taskFlag2 = false;
 let taskFlag3 = false;
+let taskFlag4 = false;
+
 
 bot.onText(/\/new/, (msg) => {
   const chatId = msg.chat.id;
@@ -35,17 +37,37 @@ bot.onText(/\/new/, (msg) => {
 
 bot.on('message', (msg) => {
   const chatId = msg.chat.id;
+
+  if (taskFlag4) {
+    if (msg.text !== 'No'){
+      if (msg.document) {
+        taskArr.fileId = msg.document.file_id
+      } else {
+        bot.sendMessage(chatId, 'Not a file!');
+      }
+    } else {
+      taskFlag4 = false;
+      apw.appendHomeWork(taskArr.subj, taskArr.task, 
+        taskArr.deadline, taskArr.fileId);
+      bot.sendMessage(chatId, 'Hometask has been successfully added!');
+      taskArr = {};
+    }
+    // taskArr.deadline = msg.text;
+    // console.log(taskArr);
+  }
   if (taskFlag3) {
     taskArr.deadline = msg.text;
-    console.log(taskArr);
-    apw.appendHomeWork(taskArr.subj, taskArr.task, taskArr.deadline);
-    bot.sendMessage(chatId, 'Hometask has been successfully added!');
+    // console.log(taskArr);
+    bot.sendMessage(chatId, 'Would you like to add file or image?',
+      {
+        "reply_markup": {"keyboard": [[{ text: "No" }]], "one_time_keyboard": true}
+      });
     taskFlag3 = false;
-    taskArr = {};
+    taskFlag4 = true;
   }
   if (taskFlag2) {
     taskArr.task = msg.text;
-    console.log(taskArr);
+    // console.log(taskArr);
     bot.sendMessage(chatId, 'Enter hometask deadline: ',
       {
         "reply_markup": {"keyboard": [[{ text: "auto" }]], "one_time_keyboard": true},
@@ -55,10 +77,9 @@ bot.on('message', (msg) => {
   }
   if (taskFlag1) {
     taskArr.subj = msg.text;
-    console.log(taskArr);
+    // console.log(taskArr);
     bot.sendMessage(chatId, 'Enter your hometask: ');
     taskFlag1 = false;
     taskFlag2 = true;
   }
-
 });

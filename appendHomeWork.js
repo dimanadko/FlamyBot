@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 
-function appendHomeWork(subj, task, deadline) {
+function appendHomeWork(subj, task, deadline, fileId) {
 
   const dataRead = fs.readFileSync('./dataBase/data.json');
   const tasksToDo = JSON.parse(dataRead);
@@ -13,7 +13,7 @@ function appendHomeWork(subj, task, deadline) {
 
   if (deadline === 'auto') deadline = nextClassIs(subj);
 
-  tasksToDo[subj].push({ task, deadline });
+  tasksToDo[subj].push({ task, deadline, fileId});
   fs.writeFileSync('./dataBase/data.json', JSON.stringify(tasksToDo));
   console.log(tasksToDo);
 }
