@@ -3,6 +3,7 @@
 const TelegramBot = require('node-telegram-bot-api');
 const config = require('./config.json');
 const apw = require('./appendHomeWork');
+const fs = require('fs')
 
 
 const token = config.token;
@@ -31,8 +32,22 @@ let taskFlag4 = false;
 bot.onText(/\/new/, (msg) => {
   const chatId = msg.chat.id;
   taskFlag1 = true;
-  bot.sendMessage(chatId,
-    'Enter your Subject: ');
+  bot.sendMessage(chatId, 'Enter your Subject: ');
+});
+
+bot.onText(/\/get (.+)/, (msg, match) => {
+  const chatId = msg.chat.id;
+  let taskData = JSON.parse(fs.readFileSync('./dataBase/data.json'));
+  if (Object.keys(taskData).includes(match[1])){
+    let subjTaskArr = taskData[match[1]];
+    console.log(subjTaskArr);
+    if (subjTaskArr.length !== 0) {
+      subjTaskArr.forEach((item) => {
+        bot.sendMessage(chatId, item.task + ' - ' + item.deadline);
+        if (item.fileId) bot.sendDocument(chatId, item.fileId);
+      });
+    } else {bot.sendMessage(chatId, 'No hometask yet');}
+  } else bot.sendMessage(chatId, 'No such subject exist');
 });
 
 bot.on('message', (msg) => {
@@ -47,7 +62,7 @@ bot.on('message', (msg) => {
       }
     } else {
       taskFlag4 = false;
-      apw.appendHomeWork(taskArr.subj, taskArr.task, 
+      apw.appendHomeWork(taskArr.subj, taskArr.task,
         taskArr.deadline, taskArr.fileId);
       bot.sendMessage(chatId, 'Hometask has been successfully added!');
       taskArr = {};
